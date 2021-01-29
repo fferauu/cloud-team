@@ -1,0 +1,61 @@
+---
+- hosts: dev
+  become: yes
+
+  vars_files:
+    - vars.yml
+
+  roles:
+    - users
+
+  tasks:
+    - name: Add gcsfuse repo
+      yum_repository:
+        name: gcsfuse
+        description: gcsfuse repo
+        baseurl: https://packages.cloud.google.com/yum/repos/gcsfuse-el7-x86_64
+        gpgkey:
+          - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+          - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+    
+    - name: Install gcsfuse util
+      yum:
+        name: gcsfuse
+        state: present
+
+    - name: Create mountpoint
+      file:
+        path: "{{ mount_point }}"
+        mode: 0775
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+
+    - name: Mount bucket
+      command: >
+        gcsfuse
+        vm-bucket-fferauu
+        /mnt/app
+      become_user: "{{ app_user }}"
+
+    - name: Copy script
+      copy:
+        src: files/processing.sh
+        dest: /usr/bin/processing.sh
+        mode: 0755
+        owner: root
+        group: root
+
+    - name: Copy systemd service file
+      template:
+        src: templates/processing.service.j2
+        dest: /etc/systemd/system/processing.service
+        owner: root
+        group: root
+        mode: 0644
+    
+    - name: Enable app-service to start at boot
+      service:
+        name: processing
+        enabled: yes
+        state: started

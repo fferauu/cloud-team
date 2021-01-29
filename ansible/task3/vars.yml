@@ -1,0 +1,9 @@
+---
+app_user: michal
+mount_point: /mnt/app
+
+users:
+  - name: "{{ app_user }}"
+    state: present
+  - name: looban
+    state: present

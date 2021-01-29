@@ -1,0 +1,3 @@
+terraform/terraform-sa.json
+ansible/task1/.ssh/*
+ansible/task3/.ssh/*

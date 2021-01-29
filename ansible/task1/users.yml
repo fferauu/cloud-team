@@ -1,0 +1,6 @@
+---
+users:
+  - name: michal
+    state: present
+  - name: looban
+    state: present

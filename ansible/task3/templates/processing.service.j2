@@ -1,0 +1,13 @@
+[Unit]
+Description=Processing script
+After=network.target
+
+[Service]
+Type=simple
+Restart=Always
+RestartSec=1
+User={{ app_user }}
+ExecStart=/usr/bin/processing.sh {{ mount_point }}
+
+[Install]
+WantedBy=multi-user.target

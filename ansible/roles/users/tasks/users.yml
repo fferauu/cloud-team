@@ -1,0 +1,25 @@
+---
+- name: Add users
+  user:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    remove: yes
+  with_items: "{{ users }}"
+
+- name: Generate ssh-key
+  openssh_keypair:
+    path: ".ssh/id_rsa_{{ item.name }}"
+    size: 2048
+    mode: 0400
+    state: "{{ item.state }}"
+  with_items: "{{ users }}"
+  delegate_to: 127.0.0.1
+  become: no
+
+- name: Copy ssh pub key
+  authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ lookup('file', '.ssh/id_rsa_{{ item.name }}.pub') }}"
+    state: present
+  when: item.state == "present"
+  with_items: "{{ users }}"
