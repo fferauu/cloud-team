@@ -1,0 +1,1 @@
+![diagram](task1.png)
